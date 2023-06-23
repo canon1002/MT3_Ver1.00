@@ -14,6 +14,18 @@
     <Filter Include="KamataEngine\Adapter">
       <UniqueIdentifier>{c6468eb4-788b-4a83-b207-a5f4804e56c5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="自作コード">
+      <UniqueIdentifier>{cffac68e-f223-4184-a665-39ba245cd30d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="自作コード\ヘッダーファイル">
+      <UniqueIdentifier>{d4d259da-3018-4350-8a42-f0d09c314a25}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="自作コード\ソースファイル">
+      <UniqueIdentifier>{2d8ba2e6-119c-48f4-9bbb-217e08389f6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="エンジンコード">
+      <UniqueIdentifier>{6a856956-7eae-43d1-b259-9d0e7562a708}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\KamataEngine\DirectXGame\base\DirectXCommon.cpp">
@@ -31,6 +43,21 @@
     <ClCompile Include="main.cpp" />
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp">
       <Filter>KamataEngine\Adapter</Filter>
+    </ClCompile>
+    <ClCompile Include="C:\KamataEngine\DirectXGame\2d\ImGuiManager.cpp">
+      <Filter>KamataEngine</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\cpp\Matrix4x4Funk.cpp">
+      <Filter>自作コード\ソースファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\cpp\Vector2Float.cpp">
+      <Filter>自作コード\ソースファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\cpp\MathTool.cpp">
+      <Filter>自作コード\ソースファイル</Filter>
+    </ClCompile>
+    <ClCompile Include="Code\cpp\MatrixCamera.cpp">
+      <Filter>自作コード\ソースファイル</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -97,17 +124,36 @@
     <ClInclude Include="C:\KamataEngine\DirectXGame\3d\SpotLight.h">
       <Filter>KamataEngine\Include</Filter>
     </ClInclude>
-    <ClInclude Include="..\DirectXGame\math\Vector2.h">
-      <Filter>KamataEngine\Include</Filter>
+    <ClInclude Include="C:\KamataEngine\DirectXGame\2d\ImGuiManager.h" />
+    <ClInclude Include="Code\hedaer\MathObject.h">
+      <Filter>自作コード\ヘッダーファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\DirectXGame\math\Vector3.h">
-      <Filter>KamataEngine\Include</Filter>
+    <ClInclude Include="Code\hedaer\MathTool.h">
+      <Filter>自作コード\ヘッダーファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\DirectXGame\math\Vector4.h">
-      <Filter>KamataEngine\Include</Filter>
+    <ClInclude Include="Code\hedaer\Matrix4x4Funk.h">
+      <Filter>自作コード\ヘッダーファイル</Filter>
     </ClInclude>
-    <ClInclude Include="..\DirectXGame\math\Matrix4x4.h">
-      <Filter>KamataEngine\Include</Filter>
+    <ClInclude Include="Code\hedaer\Vector2Float.h">
+      <Filter>自作コード\ヘッダーファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\KamataEngine\DirectXGame\math\Vector2.h">
+      <Filter>エンジンコード</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\KamataEngine\DirectXGame\math\Vector3.h">
+      <Filter>エンジンコード</Filter>
+    </ClInclude>
+    <ClInclude Include="C:\KamataEngine\DirectXGame\math\Vector4.h">
+      <Filter>エンジンコード</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\KamataEngine\DirectXGame\math\Matrix4x4.h">
+      <Filter>エンジンコード</Filter>
+    </ClInclude>
+    <ClInclude Include="VectorInt.h">
+      <Filter>自作コード\ヘッダーファイル</Filter>
+    </ClInclude>
+    <ClInclude Include="Code\hedaer\MatrixCamera.h">
+      <Filter>自作コード\ヘッダーファイル</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

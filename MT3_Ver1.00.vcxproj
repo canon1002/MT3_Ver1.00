@@ -106,16 +106,14 @@
     <ClCompile Include="C:\KamataEngine\DirectXGame\base\TextureManager.cpp" />
     <ClCompile Include="C:\KamataEngine\DirectXGame\2d\ImGuiManager.cpp" />
     <ClCompile Include="C:\KamataEngine\Adapter\Novice.cpp" />
-    <ClCompile Include="Code\cpp\Matrix.cpp" />
-    <ClCompile Include="Code\cpp\Matrix4.cpp" />
-    <ClCompile Include="Code\cpp\Matrix4x4.cpp" />
+    <ClCompile Include="Code\cpp\MathTool.cpp" />
     <ClCompile Include="Code\cpp\Matrix4x4Funk.cpp" />
+    <ClCompile Include="Code\cpp\MatrixCamera.cpp" />
     <ClCompile Include="Code\cpp\Vector2Float.cpp" />
-    <ClCompile Include="Code\cpp\Vector3Funk.cpp" />
     <ClCompile Include="main.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="C:\KamataEngine\DirectXGame\math\Matrix4x4.h" />
+    <ClInclude Include="..\..\..\..\KamataEngine\DirectXGame\math\Matrix4x4.h" />
     <ClInclude Include="C:\KamataEngine\DirectXGame\math\Vector2.h" />
     <ClInclude Include="C:\KamataEngine\DirectXGame\math\Vector3.h" />
     <ClInclude Include="C:\KamataEngine\DirectXGame\math\Vector4.h" />
@@ -143,11 +141,10 @@
     <ClInclude Include="C:\KamataEngine\Adapter\Novice.h" />
     <ClInclude Include="Code\hedaer\MathObject.h" />
     <ClInclude Include="Code\hedaer\MathTool.h" />
-    <ClInclude Include="Code\hedaer\Matrix.h" />
-    <ClInclude Include="Code\hedaer\Matrix4.h" />
     <ClInclude Include="Code\hedaer\Matrix4x4Funk.h" />
+    <ClInclude Include="Code\hedaer\MatrixCamera.h" />
     <ClInclude Include="Code\hedaer\Vector2Float.h" />
-    <ClInclude Include="Code\hedaer\Vector3Funk.h" />
+    <ClInclude Include="VectorInt.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
