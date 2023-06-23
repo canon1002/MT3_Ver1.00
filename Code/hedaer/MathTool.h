@@ -1,10 +1,18 @@
 #pragma once
 
+// è‡ªä½œã‚³ãƒ¼ãƒ‰ã®ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰
+#include"./Code/hedaer/MathObject.h"
+#include"./Code/hedaer/Matrix4x4Funk.h"
+
+// ã‚¨ãƒ³ã‚¸ãƒ³ã‚³ãƒ¼ãƒ‰ãªã©ã®ã‚¤ãƒ³ã‚¯ãƒ«ãƒ¼ãƒ‰
+#define _USE_MATH_DEFINES
 #include<cmath>
+#include"Novice.h"
 #include<Vector2.h>
 #include<Vector3.h>
 
-#pragma region ‹¤’Ê
+
+#pragma region å…±é€š
 
 /// <summary>
 /// 
@@ -13,146 +21,99 @@
 /// <param name="max"></param>
 /// <param name="min"></param>
 /// <returns></returns>
-float clamp(float num, float max, float min) 
-{
-	if (num > max) 
-	{
-		return max;
-	}
-	else if (num < min)
-	{
-		return max;
-	}
-	else
-	{
-		return num;
-	}
-}
+float clamp(float num, float max, float min);
 
 #pragma endregion
 
 
-#pragma region “ñŸŒ³ƒxƒNƒgƒ‹
+#pragma region äºŒæ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 
-float Nomalize(Vector2) 
-{
-	float result;
+/// <summary>
+/// ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’æ±‚ã‚ã‚‹
+/// </summary>
+/// <param name="v"></param>
+/// <returns></returns>
+static float Length(const Vector2& v);
 
-	return result;
-}
+/// <summary>
+/// æ­£è¦åŒ–
+/// </summary>
+/// <param name="v"></param>
+/// <returns></returns>
+Vector2 Nomalize(const Vector2& v);
 
 #pragma endregion
 
-#pragma region OŸŒ³ƒxƒNƒgƒ‹
+#pragma region ä¸‰æ¬¡å…ƒãƒ™ã‚¯ãƒˆãƒ«
 
 
-Vector3 Add(const Vector3& v1, const Vector3& v2)
-{
-	Vector3 result;
-	result.x = v1.x + v2.x;
-	result.x = v1.y + v2.y;
-	result.x = v1.z + v2.z;
-	return result;
-}
+Vector3 Add(const Vector3& v1, const Vector3& v2);
 
+Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
-Vector3 Subtract(const Vector3& v1, const Vector3& v2)
-{
-	Vector3 result;
-	result.x = v1.x - v2.x;
-	result.x = v1.y - v2.y;
-	result.x = v1.z - v2.z;
-	return result;
-}
-
-
-Vector3 Scalar(float scalar, const Vector3& v)
-{
-	Vector3 result;
-	result.x = scalar * v.x;
-	result.y = scalar * v.y;
-	result.z = scalar * v.z;
-	return result;
-}
+Vector3 Scalar(float scalar, const Vector3& v);
 
 /// <summary>
-/// ³‹K‰»
+/// ãƒ™ã‚¯ãƒˆãƒ«ã®é•·ã•ã‚’æ±‚ã‚ã‚‹
 /// </summary>
 /// <param name="v"></param>
 /// <returns></returns>
-Vector3 Nomalize(const Vector3& v)
-{
-	Vector3 result;
-	result.x = v.x / Length(v);
-	result.y = v.y / Length(v);
-	result.z = v.z / Length(v);
-
-	return result;
-}
+static float Length(const Vector3& v);
 
 /// <summary>
-/// ƒxƒNƒgƒ‹‚Ì’·‚³‚ğ‹‚ß‚é
+/// æ­£è¦åŒ–
 /// </summary>
 /// <param name="v"></param>
 /// <returns></returns>
-static float Length(const Vector3& v)
-{
-	float result;
-	result = sqrt(v.x * v.x + v.y * v.y + v.z * v.z);
-	return result;
-}
+Vector3 Nomalize(const Vector3& v);
 
 /// <summary>
-/// ƒNƒƒXÏEŠOÏ
+/// ã‚¯ãƒ­ã‚¹ç©ãƒ»å¤–ç©
 /// </summary>
 /// <param name="v1"></param>
 /// <param name="v2"></param>
 /// <returns></returns>
-static Vector3 Cross(const Vector3& v1, const Vector3& v2)
-{
-	return Vector3{
-		(v1.y * v2.z) - (v1.z * v2.y),
-		(v1.z * v2.x) - (v1.x * v2.z),
-		(v1.x * v2.y) - (v1.y * v2.x)
-	};
-};
+Vector3 Cross(const Vector3& v1, const Vector3& v2);
 
 /// <summary>
-/// ƒhƒbƒgÏE“àÏ
+/// ãƒ‰ãƒƒãƒˆç©ãƒ»å†…ç©
 /// </summary>
 /// <param name="v1"></param>
 /// <param name="v2"></param>
 /// <returns></returns>
-static float Dot(const Vector3& v1, const Vector3& v2)
-{
-	return float{ v1.x * v2.x + v1.y * v2.y + v1.z * v2.z };
-};
+float Dot(const Vector3& v1, const Vector3& v2);
 
 /// <summary>
-/// ³Ë‰eƒxƒNƒgƒ‹
+/// æ­£å°„å½±ãƒ™ã‚¯ãƒˆãƒ«
 /// </summary>
 /// <param name="v1"></param>
 /// <param name="v2"></param>
 /// <returns></returns>
-static Vector3 Project(const Vector3& v1, const Vector3& v2)
-{
-	return Scalar(Dot(v1, Nomalize(v2)), Nomalize(v2));
-}
+Vector3 Project(const Vector3& v1, const Vector3& v2);
 
 /// <summary>
-/// Å‹ßÚ“_
+/// æœ€è¿‘æ¥ç‚¹
 /// </summary>
 /// <param name="point"></param>
 /// <param name="segment"></param>
 /// <returns></returns>
-static Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
-{
-	float t = Dot(Subtract(point, segment.origin), segment.diff) / pow(Length(segment.diff), 2.0f);
-	t = clamp(t, 1.0f, 0.0f);
+Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
-	return Add(segment.origin, Scalar(t, segment.diff));
-}
+/// <summary>
+/// ã‚°ãƒªãƒƒãƒ‰ç·šã‚’è¡¨ç¤ºã™ã‚‹é–¢æ•°
+/// </summary>
+/// <param name="viewProjection"></param>
+/// <param name="viewport"></param>
+void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport);
+
+/// <summary>
+/// çƒä½“ã‚’æç”»ã™ã‚‹
+/// </summary>
+/// <param name="sphere"></param>
+/// <param name="viewProjection"></param>
+/// <param name="viewport"></param>
+/// <param name="color"></param>
+void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
+
 
 #pragma endregion
-
-

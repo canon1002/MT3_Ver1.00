@@ -1,4 +1,4 @@
-#include "Matrix4x4Funk.h"
+#include "./Code/hedaer/Matrix4x4Funk.h"
 #include <Novice.h>
 #include <cmath>
 #include <cassert>
@@ -135,7 +135,7 @@ Matrix4x4 Matrix4x4Funk::MakeIdentity() {
 }
 
 
-// 平行移動行列の作成
+/// 平行移動行列の作成
 Matrix4x4 Matrix4x4Funk::MakeTranslateMatrix(const Vector3 translate) {
 
 	return Matrix4x4{
@@ -147,7 +147,7 @@ Matrix4x4 Matrix4x4Funk::MakeTranslateMatrix(const Vector3 translate) {
 
 }
 
-// 拡大縮小行列の作成
+/// 拡大縮小行列の作成
 Matrix4x4 Matrix4x4Funk::MakeScaleMatrix(const Vector3 scale) {
 
 	return Matrix4x4{
@@ -160,7 +160,7 @@ Matrix4x4 Matrix4x4Funk::MakeScaleMatrix(const Vector3 scale) {
 }
 
 
-// 回転行列の作成(X軸周り：YZ平面)
+/// 回転行列の作成(X軸周り：YZ平面)
 Matrix4x4 Matrix4x4Funk::MakeRoatateXMatrix(float rad) {
 
 	return Matrix4x4{
@@ -172,7 +172,7 @@ Matrix4x4 Matrix4x4Funk::MakeRoatateXMatrix(float rad) {
 
 }
 
-// 回転行列の作成(Y軸周り：XZ平面)
+/// 回転行列の作成(Y軸周り：XZ平面)
 Matrix4x4 Matrix4x4Funk::MakeRoatateYMatrix(float rad) {
 
 	return Matrix4x4{
@@ -184,7 +184,7 @@ Matrix4x4 Matrix4x4Funk::MakeRoatateYMatrix(float rad) {
 
 }
 
-// 回転行列の作成(Z軸周り：XY平面)
+/// 回転行列の作成(Z軸周り：XY平面)
 Matrix4x4 Matrix4x4Funk::MakeRoatateZMatrix(float rad) {
 
 	return Matrix4x4{
@@ -197,7 +197,7 @@ Matrix4x4 Matrix4x4Funk::MakeRoatateZMatrix(float rad) {
 }
 
 
-// 座標変換
+/// 座標変換
 Vector3 Matrix4x4Funk::Transform(const Vector3& v, const Matrix4x4& m) {
 	Vector3 result = {};
 	result.x = v.x * m.m[0][0] + v.y * m.m[1][0] + v.z * m.m[2][0] + 1.0f * m.m[3][0];
@@ -211,7 +211,7 @@ Vector3 Matrix4x4Funk::Transform(const Vector3& v, const Matrix4x4& m) {
 	return result;
 }
 
-// アフィン行列の作成
+/// アフィン行列の作成
 Matrix4x4 Matrix4x4Funk::MakeAffineMatrix(const Vector3& scale, const Vector3& rotate, const Vector3& translate) {
 
 	// 回転行列を作成
@@ -230,7 +230,7 @@ Matrix4x4 Matrix4x4Funk::MakeAffineMatrix(const Vector3& scale, const Vector3& r
 }
 
 
-// 透視投影行列の作成
+/// 透視投影行列の作成
 Matrix4x4 Matrix4x4Funk::MakePerspectiveMatrix(float fovY, float aspectRatio, float nearClip, float farClip) {
 
 	return Matrix4x4{
@@ -242,7 +242,7 @@ Matrix4x4 Matrix4x4Funk::MakePerspectiveMatrix(float fovY, float aspectRatio, fl
 
 }
 
-// 正射影行列の作成
+/// 正射影行列の作成
 Matrix4x4 Matrix4x4Funk::MakeOrthographicMatrix(float left, float top, float right, float bottom, float nearClip, float farClip) {
 
 	return Matrix4x4{
@@ -254,7 +254,7 @@ Matrix4x4 Matrix4x4Funk::MakeOrthographicMatrix(float left, float top, float rig
 
 }
 
-// ビューポート変換行列の作成
+/// ビューポート変換行列の作成
 Matrix4x4 Matrix4x4Funk::MakeViewportMatrix(float left, float top, float width, float height, float minDepth, float maxDepth) {
 
 	// minD <= maxD でなければ実行しない
