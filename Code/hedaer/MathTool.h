@@ -99,6 +99,19 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 /// <returns></returns>
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
+#pragma region 衝突判定関数
+
+/// <summary>
+/// 球体同士の衝突判定を行う
+/// </summary>
+/// <param name="s1"></param>
+/// <param name="s2"></param>
+/// <returns>衝突していたらtrueを返す</returns>
+bool isCollision(const Sphere& s1, const Sphere& s2);
+
+#pragma endregion
+
+
 #pragma region 描画関連
 
 /// <summary>
@@ -118,7 +131,6 @@ void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport);
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
 
 #pragma endregion
-
 
 
 #pragma endregion

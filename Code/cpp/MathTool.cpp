@@ -180,6 +180,28 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 	return result; 
 }
 
+#pragma region 衝突判定関数
+
+bool isCollision(const Sphere& s1, const Sphere& s2) {
+
+	// 2つの球体の中心点間の距離を求める
+	float distance = Length(Subtract(s2.center, s1.center));
+
+	// 半径の合計よりも短ければ衝突
+	if (distance <= (s1.radius + s2.radius)) 
+	{
+		return true;
+	}
+
+	return false;
+
+}
+
+#pragma endregion
+
+
+#pragma region 描画関数
+
 /// <summary>
 /// グリッド線を表示する関数
 /// </summary>
@@ -297,6 +319,6 @@ void DrawSphere(
 	}
 }
 
-
+#pragma endregion
 
 #pragma endregion

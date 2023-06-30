@@ -38,20 +38,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// 課題用変数　ここから
 	//
 
-	// 線分
-	Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
-	Vector3 point{ -1.5f,0.6f,0.6f };
-	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
-	Vector3 closestPoint = ClosestPoint(point, segment);
-	
-	// 線分の始点と終点
-	Vector3 start = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
-	Vector3 end = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin, segment.diff)));
+	// 球体
+	Sphere sphereA = { {0.0f,0.0f,0.0f},2.0f };
+	Sphere sphereB = { {4.0f,0.0f,2.0f},1.0f };
 
-	// 点
-	Sphere pointSphere{ point,0.01f };
-	Sphere closestPointSphere{ closestPoint,0.01f };
+	// 球体の色
+	uint32_t color = 0xFFFFFFFF;
 
+	Vector3 screenSphereA = camera->GetScreenPos(camera->GetNdcPos(sphereA.center));
+	Vector3 screenSphereB = camera->GetScreenPos(camera->GetNdcPos(sphereB.center));
 
 	//
 	//　課題用変数　ここまで
@@ -77,11 +72,17 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 		// imGuiによる関数表示
 
+		ImGui::Begin("Camera");
+		ImGui::SliderFloat3("Camera Translate", &cameraPosition.x, -30.0f, 30.0f);
+		ImGui::SliderFloat3("Camera Rotate", &cameraRotate.x, -3.0f, 3.0f);
+		ImGui::SliderFloat3("Camera Scale", &cameraScale.x, 0.01f, 3.0f);
+		ImGui::End();
+
 		ImGui::Begin("Window");
-		ImGui::InputFloat3("point", &point.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("segment.origin", &segment.origin.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("segment.diff", &segment.diff.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
-		ImGui::InputFloat3("Project", &project.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::SliderFloat3("SphereA Center", &sphereA.center.x, -20.0f, 20.0f);
+		ImGui::SliderFloat("SphereA Radius", &sphereA.radius, -10.0f, 10.0f);
+		ImGui::SliderFloat3("SphereB Center", &sphereB.center.x, -20.0f, 20.0f);
+		ImGui::SliderFloat("SphereB Radius", &sphereB.radius, -10.0f, 10.0f);
 		ImGui::End();
 
 		// カメラの更新
@@ -89,12 +90,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->SetCameraAffine(cameraScale, cameraRotate, cameraPosition);
 		camera->Update();
 
-		project = Project(Subtract(point, segment.origin), segment.diff);
-		closestPoint = ClosestPoint(point, segment);
-		// 線分の始点と終点
-		start = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
-		end = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin, segment.diff)));
+		// 球体の座標変換
+		screenSphereA = camera->GetScreenPos(camera->GetNdcPos(sphereA.center));
+		screenSphereB = camera->GetScreenPos(camera->GetNdcPos(sphereB.center));
 
+		// 衝突判定を行い、接触していたら色を赤色に変更
+		if (isCollision(sphereA, sphereB) == true)
+		{
+			color = RED;
+		}
+		else
+		{
+			color = WHITE;
+		}
 
 		///
 		/// ↑更新処理ここまで
@@ -112,24 +120,18 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
-		// 線分の表示
-		Novice::DrawLine(
-			int(start.x), int(start.y),
-			int(end.x), int(end.y),
-			WHITE
-		);
-
-		// 球体(点)の描画
-		DrawSphere(pointSphere,
+		
+		// 球体の描画
+		DrawSphere(sphereA,
 			camera->GetViewprojectionMatrix(),
 			camera->GetViewportMatrix(),
-			RED
+			color
 		);
 
-		DrawSphere(closestPointSphere,
+		DrawSphere(sphereB,
 			camera->GetViewprojectionMatrix(),
 			camera->GetViewportMatrix(),
-			BLACK
+			color
 		);
 
 		///
