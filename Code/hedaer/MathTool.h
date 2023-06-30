@@ -2,7 +2,7 @@
 
 // 自作コードのインクルード
 #include"./Code/hedaer/MathObject.h"
-#include"./Code/hedaer/Matrix4x4Funk.h"
+#include "./Code/hedaer/MatrixCamera.h"
 
 // エンジンコードなどのインクルード
 #define _USE_MATH_DEFINES

@@ -208,7 +208,7 @@ void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport) {
 		localHeightVer[0] = { kGridEvery * (float(xIndex) - 5), 0.0f, -kGridHalfWidth };
 		localHeightVer[1] = { kGridEvery * (float(xIndex) - 5), 0.0f, kGridHalfWidth };
 
-		//
+		// ndcに変換
 		Vector3 ndcWidthStart = Matrix4x4Funk::Transform(localWidthVer[0], viewProjection);
 		Vector3 ndcWidthEnd = Matrix4x4Funk::Transform(localWidthVer[1], viewProjection);
 		Vector3 ndcHeightStart = Matrix4x4Funk::Transform(localHeightVer[0], viewProjection);
