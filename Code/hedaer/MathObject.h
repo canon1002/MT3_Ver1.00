@@ -30,6 +30,7 @@ struct Ray
 /// <summary>
 /// 線分
 /// </summary>
+/// 
 struct Segment
 {
 	Vector3 origin;

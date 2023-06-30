@@ -99,6 +99,8 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 /// <returns></returns>
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
+#pragma region 描画関連
+
 /// <summary>
 /// グリッド線を表示する関数
 /// </summary>
@@ -114,6 +116,9 @@ void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport);
 /// <param name="viewport"></param>
 /// <param name="color"></param>
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
+
+#pragma endregion
+
 
 
 #pragma endregion

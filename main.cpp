@@ -38,11 +38,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// 課題用変数　ここから
 	//
 
-	// 球
-	Sphere sphere = {
-		{0,0,0} ,
-		1,
-	};
+	// 線分
+	Segment segment{ {-2.0f,-1.0f,0.0f},{3.0f,2.0f,2.0f} };
+	Vector3 point{ -1.5f,0.6f,0.6f };
+	Vector3 project = Project(Subtract(point, segment.origin), segment.diff);
+	Vector3 closestPoint = ClosestPoint(point, segment);
+	
+	// 線分の始点と終点
+	Vector3 start = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
+	Vector3 end = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin, segment.diff)));
+
+	// 点
+	Sphere pointSphere{ point,0.01f };
+	Sphere closestPointSphere{ closestPoint,0.01f };
+
 
 	//
 	//　課題用変数　ここまで
@@ -66,24 +75,25 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		/// ↓更新処理ここから
 		///
 
+		// imGuiによる関数表示
+
+		ImGui::Begin("Window");
+		ImGui::InputFloat3("point", &point.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("segment.origin", &segment.origin.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("segment.diff", &segment.diff.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::InputFloat3("Project", &project.x, "% .3f", ImGuiInputTextFlags_ReadOnly);
+		ImGui::End();
 
 		// カメラの更新
 		camera->SetWorldAffine(scale, rotate, translate);
 		camera->SetCameraAffine(cameraScale, cameraRotate, cameraPosition);
 		camera->Update();
 
-
-		// imGuiによる関数表示
-
-		ImGui::Begin("Window");
-		ImGui::DragFloat3("cameraTransrate", &cameraPosition.x, 0.01f);
-		ImGui::DragFloat3("cameraRotate", &cameraRotate.x, 0.01f);
-		ImGui::DragFloat3("SphereCenter", &sphere.center.x, 0.01f);
-		ImGui::DragFloat("SphereRadius", &sphere.radius, 0.01f);
-		ImGui::End();
-
-
-
+		project = Project(Subtract(point, segment.origin), segment.diff);
+		closestPoint = ClosestPoint(point, segment);
+		// 線分の始点と終点
+		start = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
+		end = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin, segment.diff)));
 
 
 		///
@@ -102,11 +112,24 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
-		// 球体の描画
-		DrawSphere(sphere,
+		// 線分の表示
+		Novice::DrawLine(
+			int(start.x), int(start.y),
+			int(end.x), int(end.y),
+			WHITE
+		);
+
+		// 球体(点)の描画
+		DrawSphere(pointSphere,
 			camera->GetViewprojectionMatrix(),
 			camera->GetViewportMatrix(),
-			0x000000FF
+			RED
+		);
+
+		DrawSphere(closestPointSphere,
+			camera->GetViewprojectionMatrix(),
+			camera->GetViewportMatrix(),
+			BLACK
 		);
 
 		///
