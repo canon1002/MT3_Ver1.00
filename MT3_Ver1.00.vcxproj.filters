@@ -149,10 +149,10 @@
     <ClInclude Include="..\..\..\..\KamataEngine\DirectXGame\math\Matrix4x4.h">
       <Filter>エンジンコード</Filter>
     </ClInclude>
-    <ClInclude Include="VectorInt.h">
+    <ClInclude Include="Code\hedaer\MatrixCamera.h">
       <Filter>自作コード\ヘッダーファイル</Filter>
     </ClInclude>
-    <ClInclude Include="Code\hedaer\MatrixCamera.h">
+    <ClInclude Include="Code\hedaer\VectorInt.h">
       <Filter>自作コード\ヘッダーファイル</Filter>
     </ClInclude>
   </ItemGroup>

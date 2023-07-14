@@ -180,6 +180,14 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 	return result; 
 }
 
+Vector3 Perpendicular(const Vector3& v) {
+	if (v.x != 0 || v.y != 0) {
+		return { -v.y,v.x,0.0f };
+	}
+
+	return{ 0.0f,-v.z,v.y };
+}
+
 #pragma region 衝突判定関数
 
 bool isCollision(const Sphere& s1, const Sphere& s2) {
@@ -197,16 +205,28 @@ bool isCollision(const Sphere& s1, const Sphere& s2) {
 
 }
 
+bool isCollision(const Sphere& s, const Plane& p) {
+
+	// 絶対値を求める
+	float disance = std::fabsf(Dot(p.normal, s.center) - p.distance);
+
+	// 半径の合計よりも短ければ衝突
+	if (disance <= s.radius)
+	{
+		return true;
+	}
+
+	return false;
+
+}
+
 #pragma endregion
 
 
 #pragma region 描画関数
 
-/// <summary>
+
 /// グリッド線を表示する関数
-/// </summary>
-/// <param name="viewProjection"></param>
-/// <param name="viewport"></param>
 void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport) {
 	const float kGridHalfWidth = 2.0f;
 	const uint32_t kSubdivision = 10;
@@ -265,9 +285,9 @@ void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport) {
 	}
 }
 
-void DrawSphere(
-	const Sphere& sphere, const Matrix4x4& viewProjection, const Matrix4x4& viewport,
-	uint32_t color) {
+/// 球体を描画する
+void DrawSphere(const Sphere& sphere, 
+	const Matrix4x4& viewProjection,const Matrix4x4& viewport,uint32_t color) {
 	float pi = 3.14f;
 	const uint32_t kSubdivision = 24;
 	const float kLonEvery = (2 * pi) / kSubdivision;
@@ -317,6 +337,48 @@ void DrawSphere(
 			Novice::DrawLine(int(a.x), int(a.y), int(c.x), int(c.y), color);
 		}
 	}
+}
+
+void DrawPlane(const Plane& plane,
+	const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color) {
+
+	// <4頂点は以下の通りに求める>
+	
+	// 1.中心点を決める
+	// 2.法線と垂直なベクトルを1つ求める
+	// 3.2の逆ベクトルを求める
+	// 4.2の法線とのクロス積を求める
+	// 5.4の逆ベクトルを求める
+	// 6.2~5のベクトルを中心点にそれぞれ定数倍して	足すと4頂点が出来上がる
+
+	Vector3 center = Scalar(plane.distance, plane.normal);		// 1
+	Vector3 perpendiculars[4];
+	perpendiculars[0] = Nomalize(Perpendicular(plane.normal));	// 2
+	perpendiculars[1] = { -perpendiculars[0].x,-perpendiculars[0].y,-perpendiculars[0].z };	// 3
+	perpendiculars[2] = Cross(plane.normal, perpendiculars[0]);	// 4
+	perpendiculars[3] = { -perpendiculars[2].x,-perpendiculars[2].y,-perpendiculars[2].z };	// 5
+	
+	// 6
+	Vector3 points[4];
+	for (int32_t index = 0; index < 4; index++) {
+		Vector3 extend = Scalar(2.0f, perpendiculars[index]);
+		Vector3 point = Add(center, extend);
+		points[index] = Matrix4x4Funk::Transform(Matrix4x4Funk::Transform(point, viewProjection), viewport);
+	}
+
+	// スクリーン座標系に変換
+
+
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[2].x, (int)points[2].y, color);
+	Novice::DrawLine((int)points[0].x, (int)points[0].y, (int)points[3].x, (int)points[3].y, color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[2].x, (int)points[2].y, color);
+	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, color);
+
+	Novice::DrawEllipse((int)points[0].x, (int)points[0].y, 8, 8, 0.0f, 0xFF0000FF, kFillModeSolid);
+	Novice::DrawEllipse((int)points[1].x, (int)points[1].y, 8, 8, 0.0f, 0x00FF00FF, kFillModeSolid);
+	Novice::DrawEllipse((int)points[2].x, (int)points[2].y, 8, 8, 0.0f, 0x0000FFFF, kFillModeSolid);
+	Novice::DrawEllipse((int)points[3].x, (int)points[3].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
+
 }
 
 #pragma endregion

@@ -9,6 +9,14 @@ struct Vector2Int {
 };
 
 /// <summary>
+/// 二次元ベクトル(int*型)
+/// </summary>
+struct Vector2IntPoint {
+	int* x;
+	int* y;
+};
+
+/// <summary>
 /// 三次元ベクトル(int型)
 /// </summary>
 struct Vector3Int {

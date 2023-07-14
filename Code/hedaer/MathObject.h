@@ -10,6 +10,14 @@ struct Sphere {
 };
 
 /// <summary>
+/// 平面
+/// </summary>
+struct Plane {
+	Vector3 normal;// 法線(単位ベクトル)
+	float distance;// 距離
+};
+
+/// <summary>
 /// 直線
 /// </summary>
 struct Line

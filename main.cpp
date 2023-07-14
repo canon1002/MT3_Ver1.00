@@ -23,8 +23,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 	// カメラの拡縮・回転・平行移動を設定
 	Vector3 cameraScale = { 1.0f,1.0f,1.0f };
-	Vector3 cameraRotate = { 0.26f,0.0f,0.0f };
-	Vector3 cameraPosition = { 0.0f,1.9f,-6.49f };
+	Vector3 cameraRotate = { 0.4f,0.3f,0.0f };
+	Vector3 cameraPosition = { -3.0f,4.0f,-8.00f };
 
 	// 行列カメラのクラスを宣言・初期化
 	MatrixCamera* camera = new MatrixCamera({ kWindowSizeX,kWindowSizeY });
@@ -39,14 +39,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//
 
 	// 球体
-	Sphere sphereA = { {0.0f,0.0f,0.0f},2.0f };
-	Sphere sphereB = { {4.0f,0.0f,2.0f},1.0f };
+	Sphere sphere = { {0.0f,0.0f,0.0f},1.0f };
+
+	// 平面
+	Plane plane = { {0.0f,1.0f,0.0f},1.0f };
 
 	// 球体の色
 	uint32_t color = 0xFFFFFFFF;
 
-	Vector3 screenSphereA = camera->GetScreenPos(camera->GetNdcPos(sphereA.center));
-	Vector3 screenSphereB = camera->GetScreenPos(camera->GetNdcPos(sphereB.center));
+	Vector3 screenSphere = camera->GetScreenPos(camera->GetNdcPos(sphere.center));
+	Vector3 screenPlane = camera->GetScreenPos(camera->GetNdcPos(plane.normal));
 
 	//
 	//　課題用変数　ここまで
@@ -57,6 +59,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	char keys[256] = { 0 };
 	char preKeys[256] = { 0 };
 
+	Vector2Int mousePos = { 0,0 };
+	Vector2Int preMousePos = { 0,0 };
+
 	// ウィンドウの×ボタンが押されるまでループ
 	while (Novice::ProcessMessage() == 0) {
 		// フレームの開始
@@ -66,24 +71,71 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		memcpy(preKeys, keys, 256);
 		Novice::GetHitKeyStateAll(keys);
 
+		// マウスの入力を受け取る
+		preMousePos = mousePos;
+		Novice::GetMousePosition(&mousePos.x, &mousePos.y);
+
 		///
 		/// ↓更新処理ここから
 		///
 
+		// マウス右クリック+カーソル移動で回転
+		if (Novice::IsPressMouse(1)) {
+
+			if (0 < (preMousePos.x - mousePos.x)) {
+				cameraRotate.y += 0.01f;
+			}
+
+			if (0 > (preMousePos.x - mousePos.x)) {
+				cameraRotate.y -= 0.01f;
+			}
+
+			if (0 < (preMousePos.y - mousePos.y)) {
+				cameraRotate.x += 0.01f;
+			}
+
+			if (0 > (preMousePos.y - mousePos.y)) {
+				cameraRotate.x -= 0.01f;
+			}
+
+		}
+
+		// マウス中クリック+カーソル移動で平行移動
+		if (Novice::IsPressMouse(2)) {
+
+			if (0 < (preMousePos.x - mousePos.x)) {
+				cameraPosition.x += 0.1f;
+			}
+
+			if (0 > (preMousePos.x - mousePos.x)) {
+				cameraPosition.x -= 0.1f;
+			}
+
+			if (0 < (preMousePos.y - mousePos.y)) {
+				cameraPosition.y += 0.1f;
+			}
+
+			if (0 > (preMousePos.y - mousePos.y)) {
+				cameraPosition.y -= 0.1f;
+			}
+
+		}
+
 		// imGuiによる関数表示
 
-		ImGui::Begin("Camera");
-		ImGui::SliderFloat3("Camera Translate", &cameraPosition.x, -30.0f, 30.0f);
-		ImGui::SliderFloat3("Camera Rotate", &cameraRotate.x, -3.0f, 3.0f);
-		ImGui::SliderFloat3("Camera Scale", &cameraScale.x, 0.01f, 3.0f);
+		ImGui::Begin("Setting");
+		ImGui::Text("MousePosition(%d,%d)",mousePos.x,mousePos.y);
+		ImGui::SliderFloat3("Camera Translate", &cameraPosition.x, -5.0f, 5.0f);
+		ImGui::SliderFloat3("Camera Rotate", &cameraRotate.x, -1.0f, 1.0f);
+		ImGui::SliderFloat3("Camera Scale", &cameraScale.x, 0.1f, 2.0f);
 		ImGui::End();
 
 		ImGui::Begin("Window");
-		ImGui::SliderFloat3("SphereA Center", &sphereA.center.x, -20.0f, 20.0f);
-		ImGui::SliderFloat("SphereA Radius", &sphereA.radius, -10.0f, 10.0f);
-		ImGui::SliderFloat3("SphereB Center", &sphereB.center.x, -20.0f, 20.0f);
-		ImGui::SliderFloat("SphereB Radius", &sphereB.radius, -10.0f, 10.0f);
+		ImGui::SliderFloat3("Sphere Center", &sphere.center.x, -20.0f, 20.0f);
+		ImGui::SliderFloat("Sphere Radius", &sphere.radius, -5.0f, 5.0f);
+		ImGui::DragFloat3("Plane.Nomal", &plane.normal.x, 0.01f);
 		ImGui::End();
+		plane.normal = Nomalize(plane.normal);
 
 		// カメラの更新
 		camera->SetWorldAffine(scale, rotate, translate);
@@ -91,18 +143,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->Update();
 
 		// 球体の座標変換
-		screenSphereA = camera->GetScreenPos(camera->GetNdcPos(sphereA.center));
-		screenSphereB = camera->GetScreenPos(camera->GetNdcPos(sphereB.center));
+	
 
 		// 衝突判定を行い、接触していたら色を赤色に変更
-		if (isCollision(sphereA, sphereB) == true)
-		{
-			color = RED;
-		}
-		else
-		{
-			color = WHITE;
-		}
+		
+
 
 		///
 		/// ↑更新処理ここまで
@@ -116,19 +161,25 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		// 描画
+		if (isCollision(sphere, plane)) {
+			color = 0xFF0000FF;
+		}
+		else {
+			color = 0xFFFFFFFF;
+		}
 
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
 		
 		// 球体の描画
-		DrawSphere(sphereA,
+		DrawSphere(sphere,
 			camera->GetViewprojectionMatrix(),
 			camera->GetViewportMatrix(),
 			color
 		);
 
-		DrawSphere(sphereB,
+		DrawPlane(plane,
 			camera->GetViewprojectionMatrix(),
 			camera->GetViewportMatrix(),
 			color

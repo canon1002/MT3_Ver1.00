@@ -1,8 +1,9 @@
 #pragma once
 
 // 自作コードのインクルード
-#include"./Code/hedaer/MathObject.h"
+#include "./Code/hedaer/MathObject.h"
 #include "./Code/hedaer/MatrixCamera.h"
+#include "./Code/hedaer/VectorInt.h"
 
 // エンジンコードなどのインクルード
 #define _USE_MATH_DEFINES
@@ -99,6 +100,13 @@ Vector3 Project(const Vector3& v1, const Vector3& v2);
 /// <returns></returns>
 Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 
+/// <summary>
+/// 
+/// </summary>
+/// <param name="v"></param>
+/// <returns></returns>
+Vector3 Perpendicular(const Vector3& v);
+
 #pragma region 衝突判定関数
 
 /// <summary>
@@ -108,6 +116,14 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment);
 /// <param name="s2"></param>
 /// <returns>衝突していたらtrueを返す</returns>
 bool isCollision(const Sphere& s1, const Sphere& s2);
+
+/// <summary>
+/// 球と平面の当たり判定を行う
+/// </summary>
+/// <param name="s"></param>
+/// <param name="p"></param>
+/// <returns></returns>
+bool isCollision(const Sphere& s, const Plane& p);
 
 #pragma endregion
 
@@ -129,6 +145,15 @@ void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport);
 /// <param name="viewport"></param>
 /// <param name="color"></param>
 void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
+
+/// <summary>
+/// 平面の描画
+/// </summary>
+/// <param name="plane"></param>
+/// <param name="viewProjection"></param>
+/// <param name="viewport"></param>
+/// <param name="color"></param>
+void DrawPlane(const Plane& plane, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
 
 #pragma endregion
 
