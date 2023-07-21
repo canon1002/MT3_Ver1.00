@@ -125,6 +125,30 @@ bool isCollision(const Sphere& s1, const Sphere& s2);
 /// <returns></returns>
 bool isCollision(const Sphere& s, const Plane& p);
 
+/// <summary>
+/// 線分と平面の衝突判定を行う
+/// </summary>
+/// <param name="s"></param>
+/// <param name="p"></param>
+/// <returns></returns>
+bool isCollision(const Segment& s, const Plane& p);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="s"></param>
+/// <param name="p"></param>
+/// <returns></returns>
+bool isCollision(const Ray& r, const Plane& p);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="s"></param>
+/// <param name="p"></param>
+/// <returns></returns>
+bool isCollision(const Line& l, const Plane& p);
+
 #pragma endregion
 
 

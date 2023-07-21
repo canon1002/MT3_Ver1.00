@@ -190,6 +190,7 @@ Vector3 Perpendicular(const Vector3& v) {
 
 #pragma region 衝突判定関数
 
+//
 bool isCollision(const Sphere& s1, const Sphere& s2) {
 
 	// 2つの球体の中心点間の距離を求める
@@ -205,6 +206,7 @@ bool isCollision(const Sphere& s1, const Sphere& s2) {
 
 }
 
+//
 bool isCollision(const Sphere& s, const Plane& p) {
 
 	// 絶対値を求める
@@ -212,6 +214,77 @@ bool isCollision(const Sphere& s, const Plane& p) {
 
 	// 半径の合計よりも短ければ衝突
 	if (disance <= s.radius)
+	{
+		return true;
+	}
+
+	return false;
+
+}
+
+//
+bool isCollision(const Segment& s, const Plane& p){
+
+	// 垂直であるかの判定を行う
+	float dot = Dot(p.normal, s.diff);
+
+	// 0除算になるためb・n＝0の場合は計算不能でtが存在しないため、衝突しない
+	if (dot == 0.0f) {
+		return false;
+	}
+
+	// 距離を求める
+	float t = (p.distance - Dot(s.origin, p.normal)) / dot;
+
+	// 半径の合計よりも短ければ衝突
+	if (0.0f < t && t < 1.0f)
+	{
+		return true;
+	}
+
+	return false;
+
+}
+
+//
+bool isCollision(const Ray& r, const Plane& p) {
+
+	// 垂直であるかの判定を行う
+	float dot = Dot(p.normal, r.diff);
+
+	// 0除算になるためb・n＝0の場合は計算不能でtが存在しないため、衝突しない
+	if (dot == 0.0f) {
+		return false;
+	}
+
+	// 距離を求める
+	float t = (p.distance - Dot(r.origin, p.normal)) / dot;
+
+	// 半径の合計よりも短ければ衝突
+	if (0.0f < t && t < 2.0f)
+	{
+		return true;
+	}
+
+	return false;
+
+}
+
+bool isCollision(const Line& l, const Plane& p) {
+
+	// 垂直であるかの判定を行う
+	float dot = Dot(p.normal, l.diff);
+
+	// 0除算になるためb・n＝0の場合は計算不能でtが存在しないため、衝突しない
+	if (dot == 0.0f) {
+		return false;
+	}
+
+	// 距離を求める
+	float t = (p.distance - Dot(l.origin, p.normal)) / dot;
+
+	// 半径の合計よりも短ければ衝突
+	if (-1.0f < t && t < 2.0f)
 	{
 		return true;
 	}
@@ -374,10 +447,10 @@ void DrawPlane(const Plane& plane,
 	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[2].x, (int)points[2].y, color);
 	Novice::DrawLine((int)points[1].x, (int)points[1].y, (int)points[3].x, (int)points[3].y, color);
 
-	Novice::DrawEllipse((int)points[0].x, (int)points[0].y, 8, 8, 0.0f, 0xFF0000FF, kFillModeSolid);
-	Novice::DrawEllipse((int)points[1].x, (int)points[1].y, 8, 8, 0.0f, 0x00FF00FF, kFillModeSolid);
-	Novice::DrawEllipse((int)points[2].x, (int)points[2].y, 8, 8, 0.0f, 0x0000FFFF, kFillModeSolid);
-	Novice::DrawEllipse((int)points[3].x, (int)points[3].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
+	//Novice::DrawEllipse((int)points[0].x, (int)points[0].y, 8, 8, 0.0f, 0xFF0000FF, kFillModeSolid);
+	//Novice::DrawEllipse((int)points[1].x, (int)points[1].y, 8, 8, 0.0f, 0x00FF00FF, kFillModeSolid);
+	//Novice::DrawEllipse((int)points[2].x, (int)points[2].y, 8, 8, 0.0f, 0x0000FFFF, kFillModeSolid);
+	//Novice::DrawEllipse((int)points[3].x, (int)points[3].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
 
 }
 

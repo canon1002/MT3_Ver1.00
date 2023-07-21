@@ -38,17 +38,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// 課題用変数　ここから
 	//
 
-	// 球体
-	Sphere sphere = { {0.0f,0.0f,0.0f},1.0f };
+	// 線
+	Segment segment = { {1.0f,1.0f,0.0f} ,{1.0f,1.0f,0.0f} };
+	Line line = { {-1.0f,-1.0f,1.0f} ,{2.0f,4.0f,1.0f} };
+	Ray ray = { {-.0f,1.0f,0.0f} ,{1.0f,1.0f,2.0f} };
+	Vector3 segmentPos[2],linePos[2],rayPos[2];
 
 	// 平面
 	Plane plane = { {0.0f,1.0f,0.0f},1.0f };
 
 	// 球体の色
 	uint32_t color = 0xFFFFFFFF;
-
-	Vector3 screenSphere = camera->GetScreenPos(camera->GetNdcPos(sphere.center));
-	Vector3 screenPlane = camera->GetScreenPos(camera->GetNdcPos(plane.normal));
+	uint32_t colorL = 0xFFFFFFFF;
+	uint32_t colorR = 0xFFFFFFFF;
 
 	//
 	//　課題用変数　ここまで
@@ -112,11 +114,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 			}
 
 			if (0 < (preMousePos.y - mousePos.y)) {
-				cameraPosition.y += 0.1f;
+				cameraPosition.y -= 0.1f;
 			}
 
 			if (0 > (preMousePos.y - mousePos.y)) {
-				cameraPosition.y -= 0.1f;
+				cameraPosition.y += 0.1f;
 			}
 
 		}
@@ -131,9 +133,13 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::End();
 
 		ImGui::Begin("Window");
-		ImGui::SliderFloat3("Sphere Center", &sphere.center.x, -20.0f, 20.0f);
-		ImGui::SliderFloat("Sphere Radius", &sphere.radius, -5.0f, 5.0f);
 		ImGui::DragFloat3("Plane.Nomal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat3("Segment.Origin", &segment.origin.x, 0.01f);
+		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
+		ImGui::DragFloat3("Line.Origin", &line.origin.x, 0.01f);
+		ImGui::DragFloat3("Line.Diff", &line.diff.x, 0.01f);
+		ImGui::DragFloat3("Ray.Origin", &ray.origin.x, 0.01f);
+		ImGui::DragFloat3("Ray.Diff", &ray.diff.x, 0.01f);
 		ImGui::End();
 		plane.normal = Nomalize(plane.normal);
 
@@ -142,11 +148,35 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->SetCameraAffine(cameraScale, cameraRotate, cameraPosition);
 		camera->Update();
 
-		// 球体の座標変換
-	
+		// 座標変換
+		segmentPos[0] = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
+		segmentPos[1] = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin, segment.diff)));
+		linePos[0] = camera->GetScreenPos(camera->GetNdcPos(line.origin));
+		linePos[1] = camera->GetScreenPos(camera->GetNdcPos(Add(line.origin, line.diff)));
+		rayPos[0] = camera->GetScreenPos(camera->GetNdcPos(ray.origin));
+		rayPos[1] = camera->GetScreenPos(camera->GetNdcPos(Add(ray.origin, ray.diff)));
 
 		// 衝突判定を行い、接触していたら色を赤色に変更
-		
+		if (isCollision(segment, plane)) {
+			color = RED;
+		}
+		else {
+			color = WHITE;
+		}
+
+		if (isCollision(line, plane)) {
+			colorL = RED;
+		}
+		else {
+			colorL = WHITE;
+		}
+
+		if (isCollision(ray, plane)) {
+			colorR = RED;
+		}
+		else {
+			colorR = WHITE;
+		}
 
 
 		///
@@ -161,23 +191,35 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		// 描画
-		if (isCollision(sphere, plane)) {
-			color = 0xFF0000FF;
-		}
-		else {
-			color = 0xFFFFFFFF;
-		}
+		
 
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
-		
-		// 球体の描画
-		DrawSphere(sphere,
-			camera->GetViewprojectionMatrix(),
-			camera->GetViewportMatrix(),
+		Novice::DrawLine(
+			(int)segmentPos[0].x, (int)segmentPos[0].y,
+			(int)segmentPos[1].x, (int)segmentPos[1].y,
 			color
 		);
+
+		Novice::DrawLine(
+			(int)linePos[0].x, (int)linePos[0].y,
+			(int)linePos[1].x, (int)linePos[1].y,
+			colorL
+		);
+
+		Novice::DrawLine(
+			(int)rayPos[0].x, (int)rayPos[0].y,
+			(int)rayPos[1].x, (int)rayPos[1].y,
+			colorR
+		);
+
+		// 球体の描画
+		for (int i = 0; i < 2; i++) {
+			Novice::DrawEllipse(segmentPos[i].x, segmentPos[i].y, 8, 8, 0.0f, BLUE, kFillModeSolid);
+			Novice::DrawEllipse(linePos[i].x, linePos[i].y, 8, 8, 0.0f, GREEN, kFillModeSolid);
+			Novice::DrawEllipse(rayPos[i].x, rayPos[i].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
+		}
 
 		DrawPlane(plane,
 			camera->GetViewprojectionMatrix(),
