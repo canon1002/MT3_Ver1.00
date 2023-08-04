@@ -39,7 +39,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//
 
 	// 線
-	Segment segment = { {1.0f,1.0f,0.0f} ,{1.0f,1.0f,0.0f} };
+	Segment segment = { {0.40f,0.40f,-1.00f} ,{0.0f,0.50f,2.00f} };
 	Line line = { {-1.0f,-1.0f,1.0f} ,{2.0f,4.0f,1.0f} };
 	Ray ray = { {-.0f,1.0f,0.0f} ,{1.0f,1.0f,2.0f} };
 	Vector3 segmentPos[2],linePos[2],rayPos[2];
@@ -47,10 +47,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// 平面
 	Plane plane = { {0.0f,1.0f,0.0f},1.0f };
 
-	// 球体の色
+	// 三角形
+	Triangle triangle = {
+		-1.0f,0.0f,0.0f,
+		0.0f,1.0f,0.0f,
+		1.0f,0.0f,0.0f,
+	};
+
+	// 色
 	uint32_t color = 0xFFFFFFFF;
 	uint32_t colorL = 0xFFFFFFFF;
 	uint32_t colorR = 0xFFFFFFFF;
+
+
 
 	//
 	//　課題用変数　ここまで
@@ -133,7 +142,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::End();
 
 		ImGui::Begin("Window");
-		ImGui::DragFloat3("Plane.Nomal", &plane.normal.x, 0.01f);
+		//ImGui::DragFloat3("Plane.Nomal", &plane.normal.x, 0.01f);
+		ImGui::DragFloat3("Triangle.vertices[0]", &triangle.vertices[0].x, 0.01f);
+		ImGui::DragFloat3("Triangle.vertices[1]", &triangle.vertices[1].x, 0.01f);
+		ImGui::DragFloat3("Triangle.vertices[2]", &triangle.vertices[2].x, 0.01f);
 		ImGui::DragFloat3("Segment.Origin", &segment.origin.x, 0.01f);
 		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
 		ImGui::DragFloat3("Line.Origin", &line.origin.x, 0.01f);
@@ -142,6 +154,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::DragFloat3("Ray.Diff", &ray.diff.x, 0.01f);
 		ImGui::End();
 		plane.normal = Nomalize(plane.normal);
+		line.origin = Nomalize(line.origin);
+		segment.origin = Nomalize(segment.origin);
+		ray.origin = Nomalize(ray.origin);
+
 
 		// カメラの更新
 		camera->SetWorldAffine(scale, rotate, translate);
@@ -156,22 +172,24 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		rayPos[0] = camera->GetScreenPos(camera->GetNdcPos(ray.origin));
 		rayPos[1] = camera->GetScreenPos(camera->GetNdcPos(Add(ray.origin, ray.diff)));
 
+
+
 		// 衝突判定を行い、接触していたら色を赤色に変更
-		if (isCollision(segment, plane)) {
+		if (IsCollision(segment, triangle)) {
 			color = RED;
 		}
 		else {
 			color = WHITE;
 		}
 
-		if (isCollision(line, plane)) {
+		if (IsCollision(line, triangle)) {
 			colorL = RED;
 		}
 		else {
 			colorL = WHITE;
 		}
 
-		if (isCollision(ray, plane)) {
+		if (IsCollision(ray, triangle)) {
 			colorR = RED;
 		}
 		else {
@@ -196,36 +214,27 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
-		Novice::DrawLine(
-			(int)segmentPos[0].x, (int)segmentPos[0].y,
-			(int)segmentPos[1].x, (int)segmentPos[1].y,
-			color
-		);
-
-		Novice::DrawLine(
-			(int)linePos[0].x, (int)linePos[0].y,
-			(int)linePos[1].x, (int)linePos[1].y,
-			colorL
-		);
-
-		Novice::DrawLine(
-			(int)rayPos[0].x, (int)rayPos[0].y,
-			(int)rayPos[1].x, (int)rayPos[1].y,
-			colorR
-		);
+		// 三角形の描画
+		DrawTriangle(triangle, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
+		// 線分
+		Novice::DrawLine((int)segmentPos[0].x, (int)segmentPos[0].y,	(int)segmentPos[1].x, (int)segmentPos[1].y,color);
+		// 直線
+		//Novice::DrawLine((int)linePos[0].x, (int)linePos[0].y, (int)linePos[1].x, (int)linePos[1].y, colorL);
+		// 半直線
+		//Novice::DrawLine((int)rayPos[0].x, (int)rayPos[0].y, (int)rayPos[1].x, (int)rayPos[1].y, colorR);
 
 		// 球体の描画
 		for (int i = 0; i < 2; i++) {
 			Novice::DrawEllipse(segmentPos[i].x, segmentPos[i].y, 8, 8, 0.0f, BLUE, kFillModeSolid);
-			Novice::DrawEllipse(linePos[i].x, linePos[i].y, 8, 8, 0.0f, GREEN, kFillModeSolid);
-			Novice::DrawEllipse(rayPos[i].x, rayPos[i].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
+			//Novice::DrawEllipse(linePos[i].x, linePos[i].y, 8, 8, 0.0f, GREEN, kFillModeSolid);
+			//Novice::DrawEllipse(rayPos[i].x, rayPos[i].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
 		}
 
-		DrawPlane(plane,
+		/*DrawPlane(plane,
 			camera->GetViewprojectionMatrix(),
 			camera->GetViewportMatrix(),
 			color
-		);
+		);*/
 
 		///
 		/// ↑描画処理ここまで

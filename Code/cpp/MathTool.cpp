@@ -66,6 +66,7 @@ Vector2 Nomalize(const Vector2& v)
 
 #pragma endregion
 
+
 #pragma region 三次元ベクトル
 
 
@@ -177,7 +178,7 @@ Vector3 ClosestPoint(const Vector3& point, const Segment& segment)
 	t = clamp(t, 1.0f, 0.0f);
 
 	Vector3 result = Add(segment.origin, Scalar(t, segment.diff));
-	return result; 
+	return result;
 }
 
 Vector3 Perpendicular(const Vector3& v) {
@@ -191,13 +192,13 @@ Vector3 Perpendicular(const Vector3& v) {
 #pragma region 衝突判定関数
 
 //
-bool isCollision(const Sphere& s1, const Sphere& s2) {
+bool IsCollision(const Sphere& s1, const Sphere& s2) {
 
 	// 2つの球体の中心点間の距離を求める
 	float distance = Length(Subtract(s2.center, s1.center));
 
 	// 半径の合計よりも短ければ衝突
-	if (distance <= (s1.radius + s2.radius)) 
+	if (distance <= (s1.radius + s2.radius))
 	{
 		return true;
 	}
@@ -206,8 +207,8 @@ bool isCollision(const Sphere& s1, const Sphere& s2) {
 
 }
 
-//
-bool isCollision(const Sphere& s, const Plane& p) {
+// 
+bool IsCollision(const Sphere& s, const Plane& p) {
 
 	// 絶対値を求める
 	float disance = std::fabsf(Dot(p.normal, s.center) - p.distance);
@@ -222,8 +223,8 @@ bool isCollision(const Sphere& s, const Plane& p) {
 
 }
 
-//
-bool isCollision(const Segment& s, const Plane& p){
+// 線分と平面
+bool IsCollision(const Segment& s, const Plane& p) {
 
 	// 垂直であるかの判定を行う
 	float dot = Dot(p.normal, s.diff);
@@ -246,8 +247,8 @@ bool isCollision(const Segment& s, const Plane& p){
 
 }
 
-//
-bool isCollision(const Ray& r, const Plane& p) {
+// 半直線と平面
+bool IsCollision(const Ray& r, const Plane& p) {
 
 	// 垂直であるかの判定を行う
 	float dot = Dot(p.normal, r.diff);
@@ -270,7 +271,8 @@ bool isCollision(const Ray& r, const Plane& p) {
 
 }
 
-bool isCollision(const Line& l, const Plane& p) {
+// 直線と平面
+bool IsCollision(const Line& l, const Plane& p) {
 
 	// 垂直であるかの判定を行う
 	float dot = Dot(p.normal, l.diff);
@@ -287,6 +289,163 @@ bool isCollision(const Line& l, const Plane& p) {
 	if (-1.0f < t && t < 2.0f)
 	{
 		return true;
+	}
+
+	return false;
+
+}
+
+bool IsCollision(const Segment& s, const Triangle& tr) {
+
+	Plane plane{};
+	plane.normal =
+		Nomalize(
+			Cross(
+				Subtract(tr.vertices[1], tr.vertices[0]),
+				Subtract(tr.vertices[2], tr.vertices[1])
+			)
+		);
+
+	plane.distance = Dot(tr.vertices[0], plane.normal);
+
+	float dot = Dot(plane.normal, s.diff);
+
+	if (dot == 0.0f) {
+		return false;
+	}
+	float t = (plane.distance - Dot(s.origin, plane.normal)) / dot;
+
+	if (0.0f < t && t < 1.0f) {
+		Vector3 p = Add(s.origin, Scalar(t, s.diff));
+
+
+		Vector3 cross01 = Cross(
+			Subtract(tr.vertices[1], tr.vertices[0]),
+			Subtract(p, tr.vertices[1])
+		);
+		Vector3 cross12 = Cross(
+			Subtract(tr.vertices[2], tr.vertices[1]),
+			Subtract(p, tr.vertices[2])
+		);
+		Vector3 cross20 = Cross(
+			Subtract(tr.vertices[0], tr.vertices[2]),
+			Subtract(p, tr.vertices[0])
+		);
+
+
+		if (Dot(cross01, plane.normal) >= 0.0f &&
+			Dot(cross12, plane.normal) >= 0.0f &&
+			Dot(cross20, plane.normal) >= 0.0f) {
+			return true;
+		}
+
+	}
+
+	return false;
+
+
+}
+
+bool IsCollision(const Ray& r, const Triangle& tr) {
+
+	Plane plane{};
+
+	/// 3点で構成される平面を求める
+	// ベクトルv1(b-a),v2(c-b)を求める
+	// クロス積(v1*v2)により法線nを算出(正規化を忘れないこと)
+	plane.normal = Nomalize(
+		Cross(Subtract(tr.vertices[1], tr.vertices[0]),
+			Subtract(tr.vertices[2], tr.vertices[1]))
+	);
+
+	// a,b,cのどれか1点と平面の法線を用いて法線との距離を求める
+	plane.distance = Dot(plane.normal, r.diff);
+
+	// 垂直であるかの判定を行う
+	float dot = Dot(plane.normal, r.diff);
+	// 0除算になるためb・n＝0の場合は計算不能でtが存在しないため、衝突しない
+	if (dot == 0.0f) {
+		return false;
+	}
+	float t = (plane.distance - Dot(r.origin, plane.normal)) / dot;
+
+	// 半径の合計よりも短ければ衝突(平面)
+	if (0.0f < t && t < 1.0f)
+	{
+		// 衝突点pを求める
+		Vector3 point = Add(r.origin, Scalar(t, r.diff));
+
+		// 各辺を結んだベクトルと、頂点と衝突点pを結んだベクトルのクロス積を取る
+		Vector3 cross01 = Cross(
+			Subtract(tr.vertices[1], tr.vertices[0]),
+			Subtract(point, tr.vertices[1]));
+		Vector3 cross12 = Cross(
+			Subtract(tr.vertices[2], tr.vertices[1]),
+			Subtract(point, tr.vertices[2]));
+		Vector3 cross20 = Cross(
+			Subtract(tr.vertices[0], tr.vertices[2]),
+			Subtract(point, tr.vertices[0]));
+
+		// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
+		if (Dot(cross01, plane.normal) >= 0.0f &&
+			Dot(cross12, plane.normal) >= 0.0f &&
+			Dot(cross20, plane.normal) >= 0.0f) {
+
+			return true;
+		}
+	}
+
+	return false;
+
+}
+
+bool IsCollision(const Line& l, const Triangle& tr) {
+
+	Plane plane{};
+
+	/// 3点で構成される平面を求める
+	// ベクトルv1(b-a),v2(c-b)を求める
+	// クロス積(v1*v2)により法線nを算出(正規化を忘れないこと)
+	plane.normal = Nomalize(
+		Cross(Subtract(tr.vertices[1], tr.vertices[0]),
+			Subtract(tr.vertices[2], tr.vertices[1]))
+	);
+
+	// a,b,cのどれか1点と平面の法線を用いて法線との距離を求める
+	plane.distance = Dot(plane.normal, l.diff);
+
+	// 垂直であるかの判定を行う
+	float dot = Dot(plane.normal, l.diff);
+	// 0除算になるためb・n＝0の場合は計算不能でtが存在しないため、衝突しない
+	if (dot == 0.0f) {
+		return false;
+	}
+	float t = (plane.distance - Dot(l.origin, plane.normal)) / dot;
+
+	// 半径の合計よりも短ければ衝突(平面)
+	if (0.0f < t && t < 1.0f)
+	{
+		// 衝突点pを求める
+		Vector3 point = Add(l.origin, Scalar(t, l.diff));
+
+		// 各辺を結んだベクトルと、頂点と衝突点pを結んだベクトルのクロス積を取る
+		Vector3 cross01 = Cross(
+			Subtract(tr.vertices[1], tr.vertices[0]),
+			Subtract(point,tr.vertices[1]));
+		Vector3 cross12 = Cross(
+			Subtract(tr.vertices[2], tr.vertices[1]),
+			Subtract(point,tr.vertices[2]));
+		Vector3 cross20 = Cross(
+			Subtract(tr.vertices[0], tr.vertices[2]),
+			Subtract(point,tr.vertices[0]));
+
+		// すべての小三角形のクロス積と法線が同じ方向を向いていたら衝突
+		if (Dot(cross01, plane.normal) >= 0.0f &&
+			Dot(cross12, plane.normal) >= 0.0f &&
+			Dot(cross20, plane.normal) >= 0.0f) {
+
+			return true;
+		}
 	}
 
 	return false;
@@ -359,8 +518,8 @@ void DrawGrid(const Matrix4x4& viewProjection, const Matrix4x4& viewport) {
 }
 
 /// 球体を描画する
-void DrawSphere(const Sphere& sphere, 
-	const Matrix4x4& viewProjection,const Matrix4x4& viewport,uint32_t color) {
+void DrawSphere(const Sphere& sphere,
+	const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color) {
 	float pi = 3.14f;
 	const uint32_t kSubdivision = 24;
 	const float kLonEvery = (2 * pi) / kSubdivision;
@@ -416,7 +575,7 @@ void DrawPlane(const Plane& plane,
 	const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color) {
 
 	// <4頂点は以下の通りに求める>
-	
+
 	// 1.中心点を決める
 	// 2.法線と垂直なベクトルを1つ求める
 	// 3.2の逆ベクトルを求める
@@ -430,7 +589,7 @@ void DrawPlane(const Plane& plane,
 	perpendiculars[1] = { -perpendiculars[0].x,-perpendiculars[0].y,-perpendiculars[0].z };	// 3
 	perpendiculars[2] = Cross(plane.normal, perpendiculars[0]);	// 4
 	perpendiculars[3] = { -perpendiculars[2].x,-perpendiculars[2].y,-perpendiculars[2].z };	// 5
-	
+
 	// 6
 	Vector3 points[4];
 	for (int32_t index = 0; index < 4; index++) {
@@ -451,6 +610,24 @@ void DrawPlane(const Plane& plane,
 	//Novice::DrawEllipse((int)points[1].x, (int)points[1].y, 8, 8, 0.0f, 0x00FF00FF, kFillModeSolid);
 	//Novice::DrawEllipse((int)points[2].x, (int)points[2].y, 8, 8, 0.0f, 0x0000FFFF, kFillModeSolid);
 	//Novice::DrawEllipse((int)points[3].x, (int)points[3].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
+
+}
+
+void DrawTriangle(const Triangle& triangle,
+	const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color) {
+
+	Vector3 screenPos[3] = {};
+
+	for (int i = 0; i < 3; i++) {
+		screenPos[i] = Matrix4x4Funk::Transform(Matrix4x4Funk::Transform(triangle.vertices[i], viewProjection), viewport);
+	}
+
+	Novice::DrawTriangle(
+		(int)screenPos[0].x, (int)screenPos[0].y,
+		(int)screenPos[1].x, (int)screenPos[1].y,
+		(int)screenPos[2].x, (int)screenPos[2].y,
+		color, kFillModeWireFrame
+	);
 
 }
 

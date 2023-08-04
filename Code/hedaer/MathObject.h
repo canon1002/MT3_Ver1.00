@@ -45,3 +45,6 @@ struct Segment
 	Vector3 diff;
 };
 
+struct Triangle {
+	Vector3 vertices[3];
+};

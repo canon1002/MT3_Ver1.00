@@ -115,7 +115,7 @@ Vector3 Perpendicular(const Vector3& v);
 /// <param name="s1"></param>
 /// <param name="s2"></param>
 /// <returns>衝突していたらtrueを返す</returns>
-bool isCollision(const Sphere& s1, const Sphere& s2);
+bool IsCollision(const Sphere& s1, const Sphere& s2);
 
 /// <summary>
 /// 球と平面の当たり判定を行う
@@ -123,7 +123,7 @@ bool isCollision(const Sphere& s1, const Sphere& s2);
 /// <param name="s"></param>
 /// <param name="p"></param>
 /// <returns></returns>
-bool isCollision(const Sphere& s, const Plane& p);
+bool IsCollision(const Sphere& s, const Plane& p);
 
 /// <summary>
 /// 線分と平面の衝突判定を行う
@@ -131,7 +131,7 @@ bool isCollision(const Sphere& s, const Plane& p);
 /// <param name="s"></param>
 /// <param name="p"></param>
 /// <returns></returns>
-bool isCollision(const Segment& s, const Plane& p);
+bool IsCollision(const Segment& s, const Plane& p);
 
 /// <summary>
 /// 
@@ -139,7 +139,7 @@ bool isCollision(const Segment& s, const Plane& p);
 /// <param name="s"></param>
 /// <param name="p"></param>
 /// <returns></returns>
-bool isCollision(const Ray& r, const Plane& p);
+bool IsCollision(const Ray& r, const Plane& p);
 
 /// <summary>
 /// 
@@ -147,7 +147,11 @@ bool isCollision(const Ray& r, const Plane& p);
 /// <param name="s"></param>
 /// <param name="p"></param>
 /// <returns></returns>
-bool isCollision(const Line& l, const Plane& p);
+bool IsCollision(const Line& l, const Plane& p);
+
+bool IsCollision(const Segment& s, const Triangle& t);
+bool IsCollision(const Ray& r, const Triangle& t);
+bool IsCollision(const Line& l, const Triangle& t);
 
 #pragma endregion
 
@@ -178,6 +182,15 @@ void DrawSphere(const Sphere& sphere, const Matrix4x4& viewProjection, const Mat
 /// <param name="viewport"></param>
 /// <param name="color"></param>
 void DrawPlane(const Plane& plane, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
+
+/// <summary>
+/// 
+/// </summary>
+/// <param name="triangle"></param>
+/// <param name="viewProjection"></param>
+/// <param name="viewport"></param>
+/// <param name="color"></param>
+void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
 
 #pragma endregion
 
