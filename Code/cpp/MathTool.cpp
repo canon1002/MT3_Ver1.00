@@ -452,6 +452,20 @@ bool IsCollision(const Line& l, const Triangle& tr) {
 
 }
 
+bool IsCollision(const AABB& a, const AABB& b) {
+
+	if ((a.min.x <= b.max.x && a.max.x >= b.min.x) &&
+		(a.min.y <= b.max.y && a.max.y >= b.min.y) &&
+		(a.min.z <= b.max.z && a.max.z >= b.min.z)) {
+
+		return true;
+
+	}
+
+	return false;
+
+}
+
 #pragma endregion
 
 
@@ -628,6 +642,38 @@ void DrawTriangle(const Triangle& triangle,
 		(int)screenPos[2].x, (int)screenPos[2].y,
 		color, kFillModeWireFrame
 	);
+
+}
+
+void DrawAABB(const AABB& aabb,
+	const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color) {
+	
+	Vector3 vertices[8];
+	vertices[0] = { aabb.min.x,aabb.max.y,aabb.min.z };
+	vertices[1] = { aabb.min.x,aabb.max.y,aabb.max.z };
+	vertices[2] = { aabb.max.x,aabb.max.y,aabb.min.z };
+	vertices[3] = { aabb.max.x,aabb.max.y,aabb.max.z };
+	vertices[4] = { aabb.min.x,aabb.min.y,aabb.min.z };
+	vertices[5] = { aabb.min.x,aabb.min.y,aabb.max.z };
+	vertices[6] = { aabb.max.x,aabb.min.y,aabb.min.z };
+	vertices[7] = { aabb.max.x,aabb.min.y,aabb.max.z };
+
+	for (int i = 0; i < 8; i++) {
+		vertices[i] = Matrix4x4Funk::Transform(Matrix4x4Funk::Transform(vertices[i], viewProjection), viewport);
+	}
+
+	Novice::DrawLine(vertices[0].x, vertices[0].y, vertices[1].x, vertices[1].y, color);
+	Novice::DrawLine(vertices[0].x, vertices[0].y, vertices[2].x, vertices[2].y, color);
+	Novice::DrawLine(vertices[0].x, vertices[0].y, vertices[4].x, vertices[4].y, color);
+	Novice::DrawLine(vertices[1].x, vertices[1].y, vertices[3].x, vertices[3].y, color);
+	Novice::DrawLine(vertices[1].x, vertices[1].y, vertices[5].x, vertices[5].y, color);
+	Novice::DrawLine(vertices[2].x, vertices[2].y, vertices[3].x, vertices[3].y, color);
+	Novice::DrawLine(vertices[2].x, vertices[2].y, vertices[6].x, vertices[6].y, color);
+	Novice::DrawLine(vertices[3].x, vertices[3].y, vertices[7].x, vertices[7].y, color);
+	Novice::DrawLine(vertices[4].x, vertices[4].y, vertices[5].x, vertices[5].y, color);
+	Novice::DrawLine(vertices[4].x, vertices[4].y, vertices[6].x, vertices[6].y, color);
+	Novice::DrawLine(vertices[5].x, vertices[5].y, vertices[7].x, vertices[7].y, color);
+	Novice::DrawLine(vertices[6].x, vertices[6].y, vertices[7].x, vertices[7].y, color);
 
 }
 

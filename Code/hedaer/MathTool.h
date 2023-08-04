@@ -153,6 +153,8 @@ bool IsCollision(const Segment& s, const Triangle& t);
 bool IsCollision(const Ray& r, const Triangle& t);
 bool IsCollision(const Line& l, const Triangle& t);
 
+bool IsCollision(const AABB& a, const AABB& b);
+
 #pragma endregion
 
 
@@ -191,6 +193,10 @@ void DrawPlane(const Plane& plane, const Matrix4x4& viewProjection, const Matrix
 /// <param name="viewport"></param>
 /// <param name="color"></param>
 void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
+
+
+void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
+
 
 #pragma endregion
 

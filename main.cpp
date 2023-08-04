@@ -38,28 +38,19 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// 課題用変数　ここから
 	//
 
-	// 線
-	Segment segment = { {0.40f,0.40f,-1.00f} ,{0.0f,0.50f,2.00f} };
-	Line line = { {-1.0f,-1.0f,1.0f} ,{2.0f,4.0f,1.0f} };
-	Ray ray = { {-.0f,1.0f,0.0f} ,{1.0f,1.0f,2.0f} };
-	Vector3 segmentPos[2],linePos[2],rayPos[2];
+	// AABB
+	AABB aabb1{
+		{-0.5f,-0.5f,-0.5f},
+		{0.0f,0.0f,0.0f},
+	};
 
-	// 平面
-	Plane plane = { {0.0f,1.0f,0.0f},1.0f };
-
-	// 三角形
-	Triangle triangle = {
-		-1.0f,0.0f,0.0f,
-		0.0f,1.0f,0.0f,
-		1.0f,0.0f,0.0f,
+	AABB aabb2 = {
+		{0.2f,0.2f,0.2f},
+		{1.0f,1.0f,1.0f},
 	};
 
 	// 色
 	uint32_t color = 0xFFFFFFFF;
-	uint32_t colorL = 0xFFFFFFFF;
-	uint32_t colorR = 0xFFFFFFFF;
-
-
 
 	//
 	//　課題用変数　ここまで
@@ -142,21 +133,26 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::End();
 
 		ImGui::Begin("Window");
-		//ImGui::DragFloat3("Plane.Nomal", &plane.normal.x, 0.01f);
-		ImGui::DragFloat3("Triangle.vertices[0]", &triangle.vertices[0].x, 0.01f);
-		ImGui::DragFloat3("Triangle.vertices[1]", &triangle.vertices[1].x, 0.01f);
-		ImGui::DragFloat3("Triangle.vertices[2]", &triangle.vertices[2].x, 0.01f);
-		ImGui::DragFloat3("Segment.Origin", &segment.origin.x, 0.01f);
-		ImGui::DragFloat3("Segment.Diff", &segment.diff.x, 0.01f);
-		ImGui::DragFloat3("Line.Origin", &line.origin.x, 0.01f);
-		ImGui::DragFloat3("Line.Diff", &line.diff.x, 0.01f);
-		ImGui::DragFloat3("Ray.Origin", &ray.origin.x, 0.01f);
-		ImGui::DragFloat3("Ray.Diff", &ray.diff.x, 0.01f);
+		ImGui::SliderFloat3("aabb1 max", &aabb1.max.x, -2.0f, 2.0f);
+		ImGui::SliderFloat3("aabb1 min", &aabb1.min.x, -2.0f, 2.0f);
+		ImGui::SliderFloat3("aabb2 max", &aabb2.max.x, -2.0f, 2.0f);
+		ImGui::SliderFloat3("aabb2 min", &aabb2.min.x, -2.0f, 2.0f);
 		ImGui::End();
-		plane.normal = Nomalize(plane.normal);
-		line.origin = Nomalize(line.origin);
-		segment.origin = Nomalize(segment.origin);
-		ray.origin = Nomalize(ray.origin);
+		
+		aabb1.min.x = (std::min)(aabb1.min.x, aabb1.max.x);
+		aabb1.max.x = (std::max)(aabb1.min.x, aabb1.max.x);
+		aabb1.min.y = (std::min)(aabb1.min.y, aabb1.max.y);
+		aabb1.max.y = (std::max)(aabb1.min.y, aabb1.max.y);
+		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
+		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
+
+		aabb2.min.x = (std::min)(aabb2.min.x, aabb2.max.x);
+		aabb2.max.x = (std::max)(aabb2.min.x, aabb2.max.x);
+		aabb2.min.y = (std::min)(aabb2.min.y, aabb2.max.y);
+		aabb2.max.y = (std::max)(aabb2.min.y, aabb2.max.y);
+		aabb2.min.z = (std::min)(aabb2.min.z, aabb2.max.z);
+		aabb2.max.z = (std::max)(aabb2.min.z, aabb2.max.z);
+		
 
 
 		// カメラの更新
@@ -164,37 +160,16 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->SetCameraAffine(cameraScale, cameraRotate, cameraPosition);
 		camera->Update();
 
-		// 座標変換
-		segmentPos[0] = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
-		segmentPos[1] = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin, segment.diff)));
-		linePos[0] = camera->GetScreenPos(camera->GetNdcPos(line.origin));
-		linePos[1] = camera->GetScreenPos(camera->GetNdcPos(Add(line.origin, line.diff)));
-		rayPos[0] = camera->GetScreenPos(camera->GetNdcPos(ray.origin));
-		rayPos[1] = camera->GetScreenPos(camera->GetNdcPos(Add(ray.origin, ray.diff)));
-
-
 
 		// 衝突判定を行い、接触していたら色を赤色に変更
-		if (IsCollision(segment, triangle)) {
+		if (IsCollision(aabb1,aabb2)) {
 			color = RED;
 		}
 		else {
 			color = WHITE;
 		}
 
-		if (IsCollision(line, triangle)) {
-			colorL = RED;
-		}
-		else {
-			colorL = WHITE;
-		}
-
-		if (IsCollision(ray, triangle)) {
-			colorR = RED;
-		}
-		else {
-			colorR = WHITE;
-		}
+	
 
 
 		///
@@ -214,27 +189,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
-		// 三角形の描画
-		DrawTriangle(triangle, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
-		// 線分
-		Novice::DrawLine((int)segmentPos[0].x, (int)segmentPos[0].y,	(int)segmentPos[1].x, (int)segmentPos[1].y,color);
-		// 直線
-		//Novice::DrawLine((int)linePos[0].x, (int)linePos[0].y, (int)linePos[1].x, (int)linePos[1].y, colorL);
-		// 半直線
-		//Novice::DrawLine((int)rayPos[0].x, (int)rayPos[0].y, (int)rayPos[1].x, (int)rayPos[1].y, colorR);
-
-		// 球体の描画
-		for (int i = 0; i < 2; i++) {
-			Novice::DrawEllipse(segmentPos[i].x, segmentPos[i].y, 8, 8, 0.0f, BLUE, kFillModeSolid);
-			//Novice::DrawEllipse(linePos[i].x, linePos[i].y, 8, 8, 0.0f, GREEN, kFillModeSolid);
-			//Novice::DrawEllipse(rayPos[i].x, rayPos[i].y, 8, 8, 0.0f, 0xFF00FFFF, kFillModeSolid);
-		}
-
-		/*DrawPlane(plane,
-			camera->GetViewprojectionMatrix(),
-			camera->GetViewportMatrix(),
-			color
-		);*/
+		DrawAABB(aabb1, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
+		DrawAABB(aabb2, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
 
 		///
 		/// ↑描画処理ここまで
