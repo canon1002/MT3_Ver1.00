@@ -39,14 +39,14 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	//
 
 	// AABB
-	AABB aabb1{
+	AABB aabb{
 		{-0.5f,-0.5f,-0.5f},
 		{0.0f,0.0f,0.0f},
 	};
 
-	AABB aabb2 = {
-		{0.2f,0.2f,0.2f},
+	Sphere sphere{
 		{1.0f,1.0f,1.0f},
+		2.0f
 	};
 
 	// 色
@@ -133,25 +133,20 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::End();
 
 		ImGui::Begin("Window");
-		ImGui::SliderFloat3("aabb1 max", &aabb1.max.x, -2.0f, 2.0f);
-		ImGui::SliderFloat3("aabb1 min", &aabb1.min.x, -2.0f, 2.0f);
-		ImGui::SliderFloat3("aabb2 max", &aabb2.max.x, -2.0f, 2.0f);
-		ImGui::SliderFloat3("aabb2 min", &aabb2.min.x, -2.0f, 2.0f);
+		ImGui::SliderFloat3("aabb1 max", &aabb.max.x, -2.0f, 2.0f);
+		ImGui::SliderFloat3("aabb1 min", &aabb.min.x, -2.0f, 2.0f);
+		ImGui::SliderFloat3("sphere center", &sphere.center.x, -2.0f, 2.0f);
+		ImGui::SliderFloat("sphere radius", &sphere.radius, -2.0f, 2.0f);
 		ImGui::End();
 		
-		aabb1.min.x = (std::min)(aabb1.min.x, aabb1.max.x);
-		aabb1.max.x = (std::max)(aabb1.min.x, aabb1.max.x);
-		aabb1.min.y = (std::min)(aabb1.min.y, aabb1.max.y);
-		aabb1.max.y = (std::max)(aabb1.min.y, aabb1.max.y);
-		aabb1.min.z = (std::min)(aabb1.min.z, aabb1.max.z);
-		aabb1.max.z = (std::max)(aabb1.min.z, aabb1.max.z);
+		aabb.min.x = (std::min)(aabb.min.x, aabb.max.x);
+		aabb.max.x = (std::max)(aabb.min.x, aabb.max.x);
+		aabb.min.y = (std::min)(aabb.min.y, aabb.max.y);
+		aabb.max.y = (std::max)(aabb.min.y, aabb.max.y);
+		aabb.min.z = (std::min)(aabb.min.z, aabb.max.z);
+		aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
 
-		aabb2.min.x = (std::min)(aabb2.min.x, aabb2.max.x);
-		aabb2.max.x = (std::max)(aabb2.min.x, aabb2.max.x);
-		aabb2.min.y = (std::min)(aabb2.min.y, aabb2.max.y);
-		aabb2.max.y = (std::max)(aabb2.min.y, aabb2.max.y);
-		aabb2.min.z = (std::min)(aabb2.min.z, aabb2.max.z);
-		aabb2.max.z = (std::max)(aabb2.min.z, aabb2.max.z);
+		
 		
 
 
@@ -162,7 +157,7 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		// 衝突判定を行い、接触していたら色を赤色に変更
-		if (IsCollision(aabb1,aabb2)) {
+		if (IsCollision(aabb,sphere)) {
 			color = RED;
 		}
 		else {
@@ -189,8 +184,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
-		DrawAABB(aabb1, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
-		DrawAABB(aabb2, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
+		DrawAABB(aabb, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
+		DrawSphere(sphere, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
 
 		///
 		/// ↑描画処理ここまで

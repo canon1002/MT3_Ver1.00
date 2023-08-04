@@ -6,6 +6,7 @@
 // エンジンコードなどのインクルード
 #define _USE_MATH_DEFINES
 #include<cmath>
+#include<algorithm>
 #include"Novice.h"
 
 
@@ -465,6 +466,25 @@ bool IsCollision(const AABB& a, const AABB& b) {
 	return false;
 
 }
+
+bool IsCollision(const AABB& aabb, const Sphere& sphere) {
+
+	Vector3 cloosestPoint{
+		std::clamp(sphere.center.x,aabb.min.x,aabb.max.x),
+		std::clamp(sphere.center.y,aabb.min.y,aabb.max.y),
+		std::clamp(sphere.center.z,aabb.min.z,aabb.max.z)
+	};
+
+	float distance = Length(Subtract(cloosestPoint, sphere.center));
+
+	if (distance < sphere.radius) {
+		return true;
+	}
+
+	return false;
+
+}
+
 
 #pragma endregion
 

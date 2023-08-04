@@ -155,6 +155,8 @@ bool IsCollision(const Line& l, const Triangle& t);
 
 bool IsCollision(const AABB& a, const AABB& b);
 
+bool IsCollision(const AABB& aabb, const Sphere& sphere);
+
 #pragma endregion
 
 
