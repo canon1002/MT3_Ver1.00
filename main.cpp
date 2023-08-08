@@ -41,13 +41,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// AABB
 	AABB aabb{
 		{-0.5f,-0.5f,-0.5f},
-		{0.0f,0.0f,0.0f},
+		{0.5f,0.5f,0.5f},
 	};
 
-	Sphere sphere{
-		{1.0f,1.0f,1.0f},
-		2.0f
+	Segment segment{
+		{-0.7f,0.3f,0.0f},
+		{2.0f,-0.5f,0.0f}
 	};
+
+	Vector3 ScreenSegment[2] = {};
 
 	// 色
 	uint32_t color = 0xFFFFFFFF;
@@ -135,8 +137,8 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::Begin("Window");
 		ImGui::SliderFloat3("aabb1 max", &aabb.max.x, -2.0f, 2.0f);
 		ImGui::SliderFloat3("aabb1 min", &aabb.min.x, -2.0f, 2.0f);
-		ImGui::SliderFloat3("sphere center", &sphere.center.x, -2.0f, 2.0f);
-		ImGui::SliderFloat("sphere radius", &sphere.radius, -2.0f, 2.0f);
+		ImGui::SliderFloat3("segment origin", &segment.origin.x, -5.0f, 5.0f);
+		ImGui::SliderFloat3("segment diff", &segment.diff.x, -5.0f, 5.0f);
 		ImGui::End();
 		
 		aabb.min.x = (std::min)(aabb.min.x, aabb.max.x);
@@ -157,14 +159,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 
 
 		// 衝突判定を行い、接触していたら色を赤色に変更
-		if (IsCollision(aabb,sphere)) {
+		if (IsCollision(aabb,segment)) {
 			color = RED;
 		}
 		else {
 			color = WHITE;
 		}
 
-	
+		ScreenSegment[0] = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
+		ScreenSegment[1] = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin,segment.diff)));
 
 
 		///
@@ -185,7 +188,11 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
 		DrawAABB(aabb, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
-		DrawSphere(sphere, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
+		Novice::DrawLine(
+			(int)ScreenSegment[0].x, (int)ScreenSegment[0].y,
+			(int)ScreenSegment[1].x, (int)ScreenSegment[1].y,
+			color
+		);
 
 		///
 		/// ↑描画処理ここまで
