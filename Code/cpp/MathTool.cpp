@@ -6,7 +6,8 @@
 // エンジンコードなどのインクルード
 #define _USE_MATH_DEFINES
 #include<cmath>
-#include <algorithm>
+#include<ImGuiManager.h>
+#include<algorithm>
 #include"Novice.h"
 
 
@@ -98,6 +99,15 @@ Vector3 Scalar(float scalar, const Vector3& v)
 	result.y = scalar * v.y;
 	result.z = scalar * v.z;
 	return result;
+}
+
+Vector3 Leap(const Vector3& p0, const Vector3& p1, const float t) {
+
+	return Vector3{
+		t * p0.x + (1.0f - t) * p1.x,
+		t * p0.y + (1.0f - t) * p1.y,
+		t * p0.z + (1.0f - t) * p1.z
+	};
 }
 
 /// <summary>
@@ -762,6 +772,44 @@ void DrawAABB(const AABB& aabb,
 	Novice::DrawLine(vertices[6].x, vertices[6].y, vertices[7].x, vertices[7].y, color);
 
 }
+
+void DrawBezier(const Vector3& point0, const Vector3& point1, const Vector3& point2, 
+	const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color) {
+
+	Vector3 p0p1, p1p2, preP, p = { 0 };
+	float t = 0.0f;
+
+	preP = p;
+	p0p1 = Leap(point0, point1, t);
+	p1p2 = Leap(point1, point2, t);
+	p = Leap(p0p1, p1p2, t);
+
+	// 分割数
+	const int kDivision = 16;
+
+	for (float index = 0.0f; index <= kDivision; index++) {
+
+		t = index / kDivision;
+
+		// tの値に応じて曲線上の点を求める
+		preP = p;
+		p0p1 = Leap(point0, point1, t);
+		p1p2 = Leap(point1, point2, t);
+		p = Leap(p0p1, p1p2, t);
+
+		Vector3 screenPreP = Matrix4x4Funk::Transform(
+			Matrix4x4Funk::Transform(preP, viewProjection), viewport);
+		Vector3 screenP = Matrix4x4Funk::Transform(
+			Matrix4x4Funk::Transform(p, viewProjection), viewport);
+
+		// スクリーン座標に変換した値を用いて表示する
+		Novice::DrawLine(screenP.x, screenP.y,screenPreP.x, screenPreP.y,color);
+
+	}
+
+}
+
+
 
 #pragma endregion
 

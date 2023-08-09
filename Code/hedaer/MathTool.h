@@ -54,6 +54,8 @@ Vector3 Subtract(const Vector3& v1, const Vector3& v2);
 
 Vector3 Scalar(float scalar, const Vector3& v);
 
+Vector3 Leap(const Vector3& p0, const Vector3& p1, const float t);
+
 /// <summary>
 /// ベクトルの長さを求める
 /// </summary>
@@ -200,6 +202,8 @@ void DrawTriangle(const Triangle& triangle, const Matrix4x4& viewProjection, con
 
 void DrawAABB(const AABB& aabb, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
 
+
+void DrawBezier(const Vector3& point0, const Vector3& point1, const Vector3& point2, const Matrix4x4& viewProjection, const Matrix4x4& viewport, uint32_t color);
 
 #pragma endregion
 

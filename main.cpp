@@ -38,18 +38,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 	// 課題用変数　ここから
 	//
 
-	// AABB
-	AABB aabb{
-		{-0.5f,-0.5f,-0.5f},
-		{0.5f,0.5f,0.5f},
+	// ベジエ曲線の制御点
+	Vector3 controlPoints[3] = {
+		{-0.8f,0.58f,1.0f},
+		{1.76f,1.0f,-0.3f},
+		{0.94f,-0.7f,2.3f}
 	};
 
-	Segment segment{
-		{-0.7f,0.3f,0.0f},
-		{2.0f,-0.5f,0.0f}
-	};
-
-	Vector3 ScreenSegment[2] = {};
+	// ベジエ曲線の制御点のスクリーン座標
+	Vector3 screenControlPos[3] = {};
 
 	// 色
 	uint32_t color = 0xFFFFFFFF;
@@ -135,21 +132,10 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		ImGui::End();
 
 		ImGui::Begin("Window");
-		ImGui::SliderFloat3("aabb1 max", &aabb.max.x, -2.0f, 2.0f);
-		ImGui::SliderFloat3("aabb1 min", &aabb.min.x, -2.0f, 2.0f);
-		ImGui::SliderFloat3("segment origin", &segment.origin.x, -5.0f, 5.0f);
-		ImGui::SliderFloat3("segment diff", &segment.diff.x, -5.0f, 5.0f);
-		ImGui::End();
-		
-		aabb.min.x = (std::min)(aabb.min.x, aabb.max.x);
-		aabb.max.x = (std::max)(aabb.min.x, aabb.max.x);
-		aabb.min.y = (std::min)(aabb.min.y, aabb.max.y);
-		aabb.max.y = (std::max)(aabb.min.y, aabb.max.y);
-		aabb.min.z = (std::min)(aabb.min.z, aabb.max.z);
-		aabb.max.z = (std::max)(aabb.min.z, aabb.max.z);
-
-		
-		
+		ImGui::SliderFloat3("point0", &controlPoints[0].x, -4.0f, 4.0f);
+		ImGui::SliderFloat3("point1", &controlPoints[1].x, -4.0f, 4.0f);
+		ImGui::SliderFloat3("point2", &controlPoints[2].x, -4.0f, 4.0f);
+		ImGui::End();		
 
 
 		// カメラの更新
@@ -157,18 +143,9 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		camera->SetCameraAffine(cameraScale, cameraRotate, cameraPosition);
 		camera->Update();
 
-
-		// 衝突判定を行い、接触していたら色を赤色に変更
-		if (IsCollision(aabb,segment)) {
-			color = RED;
+		for (int i = 0; i < 3; i++) {
+			screenControlPos[i] = camera->GetScreenPos(camera->GetNdcPos(controlPoints[i]));
 		}
-		else {
-			color = WHITE;
-		}
-
-		ScreenSegment[0] = camera->GetScreenPos(camera->GetNdcPos(segment.origin));
-		ScreenSegment[1] = camera->GetScreenPos(camera->GetNdcPos(Add(segment.origin,segment.diff)));
-
 
 		///
 		/// ↑更新処理ここまで
@@ -187,12 +164,15 @@ int WINAPI WinMain(_In_ HINSTANCE, _In_opt_ HINSTANCE, _In_ LPSTR, _In_ int) {
 		// グリッド
 		DrawGrid(camera->GetViewprojectionMatrix(), camera->GetViewportMatrix());
 
-		DrawAABB(aabb, camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
-		Novice::DrawLine(
-			(int)ScreenSegment[0].x, (int)ScreenSegment[0].y,
-			(int)ScreenSegment[1].x, (int)ScreenSegment[1].y,
-			color
-		);
+		DrawBezier(controlPoints[0], controlPoints[1], controlPoints[2],
+			camera->GetViewprojectionMatrix(), camera->GetViewportMatrix(), color);
+
+		for (int i = 0; i < 3; i++) {
+			Novice::DrawEllipse(
+				(int)screenControlPos[i].x, (int)screenControlPos[i].y,
+				8, 8, 0.0f, BLUE, kFillModeSolid
+			);
+		}
 
 		///
 		/// ↑描画処理ここまで
